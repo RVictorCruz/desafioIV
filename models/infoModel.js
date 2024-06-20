@@ -2,43 +2,54 @@ const db = require("../config/database");
 
 class InfoModel {
   static getAll(callback) {
-    db.all("SELECT * FROM info", [], (err, rows) => {
-      callback(err, rows);
-    });
+    try {
+      const rows = db.prepare("SELECT * FROM info").all();
+      callback(null, rows);
+    } catch (err) {
+      callback(err);
+    }
   }
 
   static getById(id, callback) {
-    db.get("SELECT * FROM info WHERE id = ?", [id], (err, row) => {
-      callback(err, row);
-    });
+    try {
+      const row = db.prepare("SELECT * FROM info WHERE id = ?").get(id);
+      callback(null, row);
+    } catch (err) {
+      callback(err);
+    }
   }
 
   static create(info, callback) {
     const { name, idade, cidade } = info;
-    db.run(
-      "INSERT INTO info (name, idade, cidade) VALUES (?, ?, ?)",
-      [name, idade, cidade],
-      function (err) {
-        callback(err, this ? this.lastID : null);
-      }
-    );
+    try {
+      const info = db
+        .prepare("INSERT INTO info (name, idade, cidade) VALUES (?, ?, ?)")
+        .run(name, idade, cidade);
+      callback(null, info.lastInsertRowid);
+    } catch (err) {
+      callback(err);
+    }
   }
 
   static update(id, info, callback) {
     const { name, idade, cidade } = info;
-    db.run(
-      "UPDATE info SET name = ?, idade = ?, cidade = ? WHERE id = ?",
-      [name, idade, cidade, id],
-      function (err) {
-        callback(err, this ? this.changes : 0);
-      }
-    );
+    try {
+      const info = db
+        .prepare("UPDATE info SET name = ?, idade = ?, cidade = ? WHERE id = ?")
+        .run(name, idade, cidade, id);
+      callback(null, info.changes);
+    } catch (err) {
+      callback(err);
+    }
   }
 
   static delete(id, callback) {
-    db.run("DELETE FROM info WHERE id = ?", [id], function (err) {
-      callback(err, this ? this.changes : 0);
-    });
+    try {
+      const info = db.prepare("DELETE FROM info WHERE id = ?").run(id);
+      callback(null, info.changes);
+    } catch (err) {
+      callback(err);
+    }
   }
 }
 
