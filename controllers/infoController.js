@@ -24,6 +24,7 @@ class InfoController {
       res.json(row);
     });
   }
+  //testando o branch nova
 
   static create(req, res) {
     const info = req.body;
